@@ -1,0 +1,42 @@
+
+.organizations .card {
+	border-radius: 2px;
+}
+
+.organizations .card .title {
+	position: relative;
+	overflow: hidden;
+	height: 200px;
+	color: white;
+}
+
+.organizations .card .title .image {
+	position: absolute;
+	left: 0;
+	right: 0;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	height: 200px;
+	color: white;
+	vertical-align: bottom;
+	z-index: -1;
+	@grayscale: 0%;
+	-webkit-filter: grayscale(@grayscale);
+	filter: grayscale(@grayscale);
+	-webkit-transition: all 0.25s;
+	transition: all 0.25s;
+}
+
+.organizations .card:hover .title .image {
+	@scale: 2, 2;
+	@grayscale: 100%;
+	-webkit-filter: grayscale(@grayscale);
+	-moz-filter: grayscale(@grayscale);
+	-webkit-transform: scale(@scale);
+	transform: scale(@scale);
+}
+
+.organizations .card .actions {
+	background-color: white;
+}

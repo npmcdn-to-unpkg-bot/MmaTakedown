@@ -1,0 +1,91 @@
+@import "main.less";
+.organization {
+	position: fixed;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	overflow-x: auto;
+	background-color: rgba(0, 0, 0, 0.5);
+}
+
+.organization .banner {
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	background: white;
+	z-index: 2;
+}
+
+.organization .banner .image {
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	height: 150px;
+}
+
+.organization .events {
+	margin-top: 200px;
+	transition: all 0.5s;
+}
+
+.organization .events .event {
+	border-radius: 5px;
+	background-color: white;
+	margin: 20px 10px 0 10px;
+	padding: 0;
+	cursor: pointer;
+	overflow: hidden;
+}
+
+.organization .events .fights {
+	background-color: #EEE;
+	display: none;
+	margin: 0 30px;
+}
+
+.organization .events .fights.showing {
+	display: block;
+}
+
+.event-picture {
+	@height: 30px;
+	height: @height;
+	position: relative;
+	overflow:hidden;
+	.fighter {
+		position: absolute;
+		top: 0;
+		width: 50%;
+		height: @height;
+		background-size: cover;
+		background-position: 0 10%;
+		transition: all 0.25s;
+		@grayscale: 100%;
+		-webkit-filter: grayscale(@grayscale);
+		filter: grayscale(@grayscale);
+	}
+
+	.fighter1 {
+		left: 0;
+	}
+
+	.fighter2 {
+		right: 0;
+	}
+}
+
+.event:hover .event-picture div {
+	@grayscale: 0%;
+	-webkit-filter: grayscale(@grayscale);
+	filter: grayscale(@grayscale);
+}
+
+.fighter-picture {
+	height: 75px;
+	background-size: 100% auto;
+	background-position: center 0;
+	background-repeat: no-repeat;
+}
+

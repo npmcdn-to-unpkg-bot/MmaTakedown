@@ -1,0 +1,37 @@
+extends ./layout.jade
+block css
+    link(href='/css/organization.css', rel='stylesheet')
+
+block content
+    .organization
+        .row.banner
+            .col-md-4.image(style="background-image: url('/images/#{org.picture}')")
+            .col-md-8
+                h1 #{org.name}
+            
+        .events
+            each event in events
+                .row.event(data-id="#{fight.id}")
+                    .col-md-2.event-picture
+                        .fighter.fighter1(style="background-image: url('/cache/#{event.fights[0].fighter1.picture}')")
+                        .fighter.fighter2(style="background-image: url('/cache/#{event.fights[0].fighter2.picture}')")
+                    .col-md-9
+                        p #{event.name}
+                    .col-md-1
+                        span.glyphicon.glyphicon-chevron-right
+                //displaying fights
+                .fights
+                    each fight in event.fights
+                        .row
+                            .col-md-4.fighter1
+                                p #{fight.fighter1.name}
+                            .col-md-1.fighter1.fighter-picture(style="background-image: url('/cache/#{fight.fighter1.picture}')")
+                            .col-md-2
+                                p VS
+                            .col-md-1.fighter2.fighter-picture(style="background-image: url('/cache/#{fight.fighter2.picture}')")
+                            .col-md-4.fighter2
+                                p #{fight.fighter2.name}
+                        
+block scripts
+    script(src="/js/organization.js")
+                    

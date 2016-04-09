@@ -1,0 +1,21 @@
+extends ./layout.jade
+block css
+    link(href='/css/main.css', rel='stylesheet')
+block content
+    organizations loading...
+
+block scripts
+    script(src="https://npmcdn.com/angular2@2.0.0-beta.0/bundles/angular2-polyfills.js")
+    script(src="https://npmcdn.com/typescript@1.7.5/lib/typescript.js")
+    script(src="https://npmcdn.com/systemjs@0.19.8/dist/system.src.js")
+    script(src="https://npmcdn.com/rxjs@5.0.0-beta.0/bundles/Rx.js")
+    script(src="https://npmcdn.com/angular2@2.0.0-beta.0/bundles/angular2.dev.js")
+    script(src="https://npmcdn.com/angular2@2.0.0-beta.0/bundles/http.dev.js")
+    script(src="https://npmcdn.com/angular2@2.0.0-beta.0/bundles/router.dev.js")
+ 
+    script
+        System.config({
+        transpiler: 'typescript', typescriptOptions:{ emitDecoratorMetadata: true } });
+        //load our hello-world component
+        System.import('ts/main.ts'); 
+        

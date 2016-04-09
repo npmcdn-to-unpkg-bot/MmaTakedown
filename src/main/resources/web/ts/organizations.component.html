@@ -1,0 +1,12 @@
+<h1>{{title}}</h1>
+<div class="organizations row">
+	<div class="col-md-4 card" *ngFor="#org of organizations" (click)="goToOrganization(org)">
+		<div class="title">
+			<div class="image"
+				style="background-image: url('images/{{ org.picture }}')"></div>
+			<h2>{{ org.name }}</h2>
+		</div>
+		<div class="actions">Events >></div>
+	</div>
+</div>
+ <router-outlet></router-outlet>

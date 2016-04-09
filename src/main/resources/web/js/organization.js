@@ -1,0 +1,1 @@
+$(document).ready(function(){function n(n){n.next(".fights").toggleClass("showing")}$(".event").click(function(){n($(this))})})
