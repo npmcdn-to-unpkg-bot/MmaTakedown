@@ -68,7 +68,7 @@ public class FighterJobs {
 	 */
 	public Fighter refreshInfo(Fighter fighter) throws IOException, ParseException, SQLException {
 		logger.info("Refreshing fighter {}", fighter.getName());
-		Document doc = Jsoup.connect(fighter.getSherdogUrl()).get();
+		Document doc = Jsoup.connect(fighter.getSherdogUrl()).timeout(Constants.PARSING_TIMEOUT).get();
 
 		// Getting nick name
 		try {
@@ -137,7 +137,7 @@ public class FighterJobs {
 			String newPath = Constants.FIGHTER_PICTURE_CACHE_FOLDER + fighter.getId() + ".JPG";
 			File f = new File(newPath);
 			FileUtils.copyURLToFile(new URL(url), f);
-			fighter.setPicture(newPath.replace("cache/", ""));
+			fighter.setPicture(newPath.replace(Constants.CACHE_FOLDER, "cache/"));
 		}
 
 		DB.fighterDao.update(fighter);

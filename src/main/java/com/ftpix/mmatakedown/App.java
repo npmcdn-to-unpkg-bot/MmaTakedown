@@ -2,11 +2,9 @@ package com.ftpix.mmatakedown;
 
 import static spark.Spark.*;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,12 +23,12 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ftpix.mmatakedown.controllers.OrganizationController;
 import com.ftpix.mmatakedown.db.DB;
+import com.ftpix.mmatakedown.endpoints.DataRefresh;
 import com.ftpix.mmatakedown.endpoints.EventREST;
 import com.ftpix.mmatakedown.endpoints.FightREST;
 import com.ftpix.mmatakedown.endpoints.FighterREST;
-import com.ftpix.mmatakedown.endpoints.MVCEndpoints;
+
 import com.ftpix.mmatakedown.endpoints.OrganizationREST;
 import com.ftpix.mmatakedown.jobs.RefreshDatabase;
 import com.ftpix.mmatakedown.models.Organization;
@@ -44,123 +42,132 @@ import spark.template.jade.JadeTemplateEngine;
  */
 public class App {
 
-	private final static Logger logger = LoggerFactory.getLogger(App.class);
+    private final static Logger logger = LoggerFactory.getLogger(App.class);
 
-	public static void main(String[] args) {
-		try {
-			staticFileLocation("/web");
-			
-			//MVCEndpoints.defineEndpoints();
-			System.out.println("yo");
+    public static void main(String[] args) {
+        try {
+            staticFileLocation("/web");
 
-			get("/", (req, res) -> {
-				Map<String, Object> model = new HashMap<String, Object>();
+            //MVCEndpoints.defineEndpoints();
 
-				return new ModelAndView(model, "index");
-			}, new JadeTemplateEngine());
-			
-			OrganizationREST.defineEndpoints();
-			EventREST.defineEndpoints();
-			FightREST.defineEndpoints();
-			FighterREST.defineEndpoints();
+            port(Constants.PORT);
 
-			// serving file from cache
-			get("/cache/*", (request, response) -> {
-				File file = new File(Constants.CACHE_FOLDER + request.splat()[0]);
-				logger.info("Looking for file [{}]", file.getAbsolutePath());
-				
-				if (file.exists()) {
-					response.raw().setContentType("application/octet-stream");
-					response.raw().setHeader("Content-Disposition", "attachment; filename=" + file.getName());
+            get("/", (req, res) -> {
+                Map<String, Object> model = new HashMap<String, Object>();
 
-					FileInputStream in = new FileInputStream(file);
+                return new ModelAndView(model, "index");
+            }, new JadeTemplateEngine());
 
-					byte[] buffer = new byte[1024];
-					int len;
-					while ((len = in.read(buffer)) > 0) {
-						response.raw().getOutputStream().write(buffer, 0, len);
-					}
+            
+            //End points
+            OrganizationREST.defineEndpoints();
+            EventREST.defineEndpoints();
+            FightREST.defineEndpoints();
+            FighterREST.defineEndpoints();
 
-					return response.raw();
-				} else {
-					response.status(404);
-					return "";
-				}
+            DataRefresh.defineEndPoints();
+            
+            // serving file from cache
+            get("/cache/*", (request, response) -> {
+                File file = new File(Constants.CACHE_FOLDER + request.splat()[0]);
+                logger.info("Looking for file [{}]", file.getAbsolutePath());
 
-			});
+                if (file.exists()) {
+                    response.raw().setContentType("application/octet-stream");
+                    response.raw().setHeader("Content-Disposition", "attachment; filename=" + file.getName());
 
-			// Setting content type to JSON for api calls
-			after("/api/*", (request, response) -> {
-				response.header("Content-Encoding", "gzip");
-				response.type("application/json");
-			});
+                    FileInputStream in = new FileInputStream(file);
 
-			prepareData();
-			prepareJobs();
-		} catch (Exception e) {
-			logger.error("Error while initializing the application, exiting...", e);
-			System.exit(0);
-		}
-	}
+                    byte[] buffer = new byte[1024];
+                    int len;
+                    while ((len = in.read(buffer)) > 0) {
+                        response.raw().getOutputStream().write(buffer, 0, len);
+                    }
 
-	/**
-	 * Preset data for famous MMA Organizations
-	 * 
-	 * @throws SQLException
-	 */
-	private static void prepareData() throws SQLException {
-		Organization ufc = DB.organizationDao.queryForId(1);
-		if (ufc == null) {
-			ufc = new Organization();
-			ufc.setFollowing(false);
-			ufc.setGetPrelims(false);
-			ufc.setId(1);
-		}
-		ufc.setName("UFC");
-		ufc.setShortName("ufc");
-		ufc.setToRemoveFromEventName("UFC");
-		ufc.setSherdogUrl("http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-2");
-		ufc.setPicture("ufc.jpg");
-		// ufc.setSearchInterceptor(UfcInterceptor.class.getCanonicalName());
 
-		// DB.organizationDao.createOrUpdate(ufc);
+                    in.close();
+                    return response.raw();
+                } else {
+                    response.status(404);
+                    return "";
+                }
 
-		Organization invicta = DB.organizationDao.queryForId(2);
-		if (invicta == null) {
-			invicta = new Organization();
-			invicta.setFollowing(false);
-			invicta.setGetPrelims(false);
-			invicta.setId(2);
-		}
-		invicta.setName("Invicta FC");
-		invicta.setShortName("invicta");
-		invicta.setToRemoveFromEventName("invicta,fc");
-		invicta.setSherdogUrl("http://www.sherdog.com/organizations/Invicta-Fighting-Championships-4469");
-		invicta.setSearchInterceptor("");
-		invicta.setPicture("invicta.jpg");
-		DB.organizationDao.createOrUpdate(invicta);
-	}
+            });
 
-	/**
-	 * Create the scheduling jobs for refreshing the data and fetching events
-	 * 
-	 * @throws SchedulerException
-	 */
-	private static void prepareJobs() throws SchedulerException {
-		SchedulerFactory sf = new StdSchedulerFactory();
-		Scheduler scheduler = sf.getScheduler();
+            // Setting content type to JSON for api calls
+            after("/api/*", (request, response) -> {
+                response.header("Content-Encoding", "gzip");
+                response.type("application/json");
+            });
 
-		Date runTime = DateBuilder.evenMinuteDate(new Date());
+            prepareData();
+            prepareJobs();
+        } catch (Exception e) {
+            logger.error("Error while initializing the application, exiting...", e);
+            System.exit(0);
+        }
+    }
 
-		JobDetail job = JobBuilder.newJob(RefreshDatabase.class).withIdentity("RefreshDB", "MMA").build();
+    /**
+     * Preset data for famous MMA Organizations
+     * 
+     * @throws SQLException
+     */
+    private static void prepareData() throws SQLException {
+        Organization ufc = DB.organizationDao.queryForId(1);
+        if (ufc == null) {
+            ufc = new Organization();
+            ufc.setFollowing(false);
+            ufc.setGetPrelims(false);
+            ufc.setId(1);
+        }
+        ufc.setName("UFC");
+        ufc.setShortName("ufc");
+        ufc.setToRemoveFromEventName("UFC");
+        ufc.setSherdogUrl("http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-2");
+        ufc.setPicture("ufc.jpg");
+        // ufc.setSearchInterceptor(UfcInterceptor.class.getCanonicalName());
 
-		Trigger trigger = TriggerBuilder.newTrigger().withIdentity("RefreshDB", "MMA")
-				.withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInHours(12).repeatForever()).build();
+        // DB.organizationDao.createOrUpdate(ufc);
 
-		scheduler.scheduleJob(job, trigger);
-		logger.info(job.getKey() + " will run at: " + runTime);
+        Organization invicta = DB.organizationDao.queryForId(2);
+        if (invicta == null) {
+            invicta = new Organization();
+            invicta.setFollowing(false);
+            invicta.setGetPrelims(false);
+            invicta.setId(2);
+        }
+        invicta.setName("Invicta FC");
+        invicta.setShortName("invicta");
+        invicta.setToRemoveFromEventName("invicta,fc");
+        invicta.setSherdogUrl("http://www.sherdog.com/organizations/Invicta-Fighting-Championships-4469");
+        invicta.setSearchInterceptor("");
+        invicta.setPicture("invicta.jpg");
+        DB.organizationDao.createOrUpdate(invicta);
+    }
 
-		scheduler.start();
-	}
+    /**
+     * Create the scheduling jobs for refreshing the data and fetching events
+     * 
+     * @throws SchedulerException
+     */
+    private static void prepareJobs() throws SchedulerException {
+        SchedulerFactory sf = new StdSchedulerFactory();
+        Scheduler scheduler = sf.getScheduler();
+
+        Date runTime = DateBuilder.evenMinuteDate(new Date());
+
+        JobDetail job = JobBuilder.newJob(RefreshDatabase.class).withIdentity("RefreshDB", "MMA").build();
+
+        Trigger trigger =
+                          TriggerBuilder.newTrigger().withIdentity("RefreshDB", "MMA")
+                                        .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInHours(6).repeatForever())
+                                        .build();
+
+        scheduler.scheduleJob(job, trigger);
+        logger.info(job.getKey() + " will run at: " + runTime);
+
+        scheduler.start();
+    }
 
 }

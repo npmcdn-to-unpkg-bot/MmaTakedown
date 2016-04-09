@@ -216,7 +216,11 @@ public class Event {
 
 
 	public Fight[] getFights() {
+		if(fights != null){
 		return fights.toArray(new Fight[fights.size()]);
+		}else{
+			return new Fight[0];
+		}
 	}
 
 

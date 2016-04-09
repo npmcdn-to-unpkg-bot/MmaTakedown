@@ -2,6 +2,7 @@ package com.ftpix.mmatakedown.db;
 
 import java.sql.SQLException;
 
+import com.ftpix.mmatakedown.Constants;
 import com.ftpix.mmatakedown.models.Event;
 import com.ftpix.mmatakedown.models.Fight;
 import com.ftpix.mmatakedown.models.Fighter;
@@ -20,7 +21,7 @@ public class DB {
 	public static Dao<Fighter, Integer> fighterDao = null;
 	public static Dao<Setting, Integer> settingsDao = null;
 	
-	private final static String databaseUrl = "jdbc:h2:./mtd";
+	private final static String databaseUrl = "jdbc:h2:"+Constants.DB_PATH;
 	static {
 		try {
 

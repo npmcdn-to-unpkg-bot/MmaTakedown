@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ftpix.mmatakedown.Constants;
+import com.ftpix.mmatakedown.controllers.EventController;
 import com.ftpix.mmatakedown.db.DB;
 import com.ftpix.mmatakedown.jobs.subjobs.EventJobs;
 import com.ftpix.mmatakedown.jobs.subjobs.OrganizationJobs;
@@ -37,14 +38,13 @@ import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.Where;
 
-
 @DisallowConcurrentExecution
 public class RefreshDatabase implements Job {
 	private final Logger logger = LoggerFactory.getLogger(RefreshDatabase.class);
 
-	
 	private OrganizationJobs organizationJobs = new OrganizationJobs();
 	private EventJobs eventJobs = new EventJobs();
+
 	public void updateDB() throws SQLException {
 
 		List<Organization> Organizations = organizationDao.queryForAll();
@@ -57,11 +57,22 @@ public class RefreshDatabase implements Job {
 
 			// Getting event fights
 			try {
-
-				organizationJobs.cleanEvents(organization);
+				Date newYorkDate = DateUtils.convertTimeZone(new Date(), TimeZone.getDefault(),
+						TimeZone.getTimeZone(Constants.SHERDOG_TIME_ZONE));
+				EventController controller = new EventController();
+				// organizationJobs.cleanEvents(organization);
 				for (Event event : organizationJobs.getEvents(organization)) {
-					// Getting fights
-					eventJobs.getFights(event);
+					// Getting fights for event that are not past yet or that
+					// have no fights
+					
+
+					boolean shouldGetFights = event.getDate().after(newYorkDate)
+							|| controller.getFights(event.getId()).size() == 0;
+					if (shouldGetFights) {
+						eventJobs.getFights(event);
+					}else{
+						logger.info("No need to find fights for event #{}[{}], past and already has list of fights", event.getId(), event.getName());
+					}
 				}
 			} catch (IOException | ParseException e) {
 				logger.error("Can't parse events for Organization " + organization.getName(), e);
@@ -69,13 +80,6 @@ public class RefreshDatabase implements Job {
 		}
 
 	}
-
-	
-
-	
-
-	
-
 
 	@Override
 	public void execute(JobExecutionContext ctx) throws JobExecutionException {

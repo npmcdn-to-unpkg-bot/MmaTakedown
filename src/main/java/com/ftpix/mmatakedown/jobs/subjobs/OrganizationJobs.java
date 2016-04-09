@@ -23,8 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ftpix.mmatakedown.Constants;
+import com.ftpix.mmatakedown.controllers.EventController;
 import com.ftpix.mmatakedown.db.DB;
 import com.ftpix.mmatakedown.models.Event;
+import com.ftpix.mmatakedown.models.Fight;
 import com.ftpix.mmatakedown.models.Organization;
 import com.ftpix.mmatakedown.utils.DateUtils;
 import com.j256.ormlite.stmt.PreparedQuery;
@@ -34,12 +36,10 @@ import com.j256.ormlite.stmt.Where;
 public class OrganizationJobs {
 	private final int DATE_COLUMN = 1, NAME_COLUMN = 2, LOCATION_COLUMN = 3;
 	private final Logger logger = LoggerFactory.getLogger(OrganizationJobs.class);
-	
+
 	private final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HHmmssZ");
 	private final SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	
-	
-	
+
 	/**
 	 * 
 	 * @param organization
@@ -51,14 +51,12 @@ public class OrganizationJobs {
 	public List<Event> getEvents(Organization organization) throws IOException, ParseException, SQLException {
 
 		// finding events
-		List<Event> availableEvents = eventDao.queryForEq("organization_id", organization.getId());
 
 		List<Event> events = new ArrayList<>();
-		logger.info("Availale Events: {}", availableEvents.size());
 
 		logger.info("Refreshing available event list");
 
-		Document doc = Jsoup.connect(organization.getSherdogUrl()).get();
+		Document doc = Jsoup.connect(organization.getSherdogUrl()).timeout(Constants.PARSING_TIMEOUT).get();
 		Elements td = doc.select(".event td");
 		int i = 1;
 		td.remove(0);
@@ -110,11 +108,8 @@ public class OrganizationJobs {
 				// logger.info("Event date: Sherdog:{}, local:{}",
 				// event.getDate(), local);
 
-				if (!availableEvents.contains(event)) {
-					logger.info("Adding event {}", event.getName());
-					events.add(event);
-					eventDao.create(event);
-				}
+				logger.info("Adding event {}", event.getName());
+				events.add(event);
 
 				event = new Event();
 				i = 1;
@@ -122,11 +117,45 @@ public class OrganizationJobs {
 			// logger.info(element.html());
 		}
 
+		// comparing new list with old one
+		List<Event> currentEvents = eventDao.queryForEq("organization_id", organization.getId());
+		logger.info("Current Events: {}, Found events: {}", currentEvents.size(), events.size());
+
+		// findinf events that don't exist anymore
+		// if it exists setting the ip for the new one so that it'll update
+		// instead of being created
+		for (Event current : currentEvents) {
+			if (events.contains(current)) {
+				Event toUpdate = events.get(events.indexOf(current));
+				toUpdate.setId(current.getId());
+				toUpdate.setEarlyPrelimLocation(current.getEarlyPrelimLocation());
+				toUpdate.setEarlyPrelimStatus(current.getEarlyPrelimStatus());
+				toUpdate.setLocation(current.getLocation());
+				toUpdate.setPrelimStatus(current.getPrelimStatus());
+				toUpdate.setPrelimLocation(current.getPrelimLocation());
+				toUpdate.setStatus(current.getStatus());
+			} else {
+				logger.info("Event #{}[{}] doesn't exist anymore, deleting it", current.getId(), current.getName());
+				// this event doesn't seem to exist anymore we need to delete it
+				eventDao.delete(current);
+				fightDao.delete(Arrays.asList(current.getFights()));
+			}
+		}
+
+		// saving the new events
+		events.forEach((toUpdate) -> {
+			try {
+				eventDao.createOrUpdate(toUpdate);
+				
+			} catch (Exception e) {
+				logger.error("Error while saving event! ", e);
+			}
+		});
+
 		// TODO: FIND CANCELLED EVENTS
 		return events;
 	}
-	
-	
+
 	/**
 	 * Cleans the DB from all future events and events with 0 fights
 	 * 
@@ -154,9 +183,9 @@ public class OrganizationJobs {
 			int deletedFights = fightDao.delete(Arrays.asList(event.getFights()));
 			logger.info("Deleted {} fights for event {}", deletedFights, event.getName());
 		}
-		
+
 		int deleted = eventDao.delete(eventsToDelete);
-			
+
 		logger.info("Deleted {} future events", deleted);
 
 		// Finding events with 0 fights
@@ -169,5 +198,5 @@ public class OrganizationJobs {
 		}
 
 	}
-	
+
 }

@@ -1,0 +1,64 @@
+<div class="event">
+	<div class="row" (click)="toggle()">
+		<div class="col-md-6">
+			<h3>{{ event.name }}</h3>
+		</div>
+		<div class="col-md-6 date">{{ event.date }}</div>
+
+	</div>
+	<div clas="status row" *ngIf="showDetails">
+		<a (click)="refreshEvent()">Refresh</a>
+		<table class=" col-md-12 table table-striped table-condensed table-hover">
+			<thead>
+				<tr>
+					<th>Card</th>
+					<th>Status</th>
+					<th>File</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><strong>Main</strong></td>
+					<td>{{getStatusLabel(event.status)}}</td>
+					<td></td>
+					<td><select (change)="statusChanged($event.target.value)">
+							<option value="-1">Change to</option>
+							<option value="0">Skipped</option>
+							<option value="1">Wanted</option>
+					</select></td>
+				</tr>
+
+				<tr>
+					<td><strong>Prelims</strong></td>
+					<td>{{getStatusLabel(event.prelimStatus)}}</td>
+					<td></td>
+					<td><select
+						(change)="prelimStatusChanged($event.target.value)">
+							<option value="-1">Change to</option>
+							<option value="0">Skipped</option>
+							<option value="1">Wanted</option>
+					</select></td>
+				</tr>
+
+				<tr>
+					<td><strong>Eary prelims</strong></td>
+					<td>{{getStatusLabel(event.earlyPrelimStatus)}}</td>
+					<td></td>
+					<td><select
+						(change)="earlyPrelimStatusChanged($event.target.value)">
+							<option value="-1">Change to</option>
+							<option value="0">Skipped</option>
+							<option value="1">Wanted</option>
+					</select></td>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+	<div class="row details" *ngIf="showDetails">
+		<div class="row fights">
+			<fight class="col-md-4" *ngFor="#fight of fights" [fight]="fight"></fight>
+		</div>
+	</div>
+</div>

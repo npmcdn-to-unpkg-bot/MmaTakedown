@@ -1,3 +1,5 @@
 <div class="row" *ngIf="organization">
-	<h1>{{organization.name}} - yeah !</h1>
+	<h1>{{organization.name}}</h1>
+	
+	<event *ngFor="#event of events" [event]="event">Loading...</event>
 </div>

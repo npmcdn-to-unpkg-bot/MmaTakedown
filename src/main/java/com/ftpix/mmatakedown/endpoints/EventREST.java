@@ -58,12 +58,13 @@ private final static Logger logger = LoggerFactory.getLogger(OrganizationREST.cl
 		put("/api/event", (req, res) -> {
 
 			try {
+				logger.info("Body: {}", req.body());
 				Event org = gson.fromJson(req.body(), Event.class);
 				return controller.update(org);
 			} catch (Exception e) {
 				res.status(HttpStatus.INTERNAL_SERVER_ERROR_500);
 				logger.error("Error while updating organization", e);
-				return "Error while creating organization";
+				return "Error while updating event";
 			}
 
 		}, gson::toJson);

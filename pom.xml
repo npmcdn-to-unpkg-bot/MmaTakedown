@@ -126,9 +126,11 @@
 					<outputDirectory>${project.build.resources[0].directory}/web/css</outputDirectory>
 					<compress>true</compress>
 					<includes>
-						<include>organization.less</include>
-						<include>organizations.less</include>
+						<include>*.less</include>
 					</includes>
+					<excludes>
+						<exclude>variables.less</exclude>
+					</excludes>
 				</configuration>
 				<executions>
 					<execution>
