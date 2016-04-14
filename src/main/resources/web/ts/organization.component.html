@@ -1,5 +1,41 @@
-<div class="row" *ngIf="organization">
-	<h1>{{organization.name}}</h1>
+<div class="stack" *ngIf="organization">
+	<div class="row title" >
+		<div class="col-md-12">
+			<h1>{{ organization.name }}</h1>
+		</div>
+	</div>
 	
-	<event *ngFor="#event of events" [event]="event">Loading...</event>
+	<h2>Options</h2>
+	<div class="options card row">
+	   <div class="col-md-4">
+	       Follow: <input type="checkbox" [(ngModel)]="organization.following" (change)="updateOrganization()" value="1"/>
+	   </div>
+	   <div class="col-md-4">
+	       Prelims: <input type="checkbox" [(ngModel)]="organization.getPrelims" (change)="updateOrganization()" value="1"/>
+	   </div>
+	   <div class="col-md-4">
+	       Quality:
+	       <select [(ngModel)]="organization.quality" (change)="updateOrganization()">
+	           <option value="0">SD</option>
+	           <option value="1">HD</option>
+	           <option value="2">Any</option>
+	       </select>
+	   </div>
+	   
+	</div>
+	
+	<h2>Events</h2>
+	<div class="events card">
+    	<div *ngFor="#event of events" class="row event"  (click)="goToEvent(event)" (change)="updateOrganization()">
+    	   <div class="col-md-3">
+    	       {{ event.date }}
+    	   </div>
+    	   <div class="col-md-9">
+    	       {{ event.name }}
+    	   </div>
+    	</div>
+	</div>
 </div>
+<div class="stack" *ngIf="!organization">
+    <div class="spinner"></div>
+</div >

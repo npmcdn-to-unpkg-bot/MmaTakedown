@@ -5,7 +5,7 @@ import {Event} from './event.ts';
 import { RouteParams } from 'angular2/router';
 import {Fight} from './fight.ts';
 import {FightComponent} from './fight.component.ts';
-
+import { RouteParams } from 'angular2/router';
 
 @Component({
     selector: 'event',
@@ -21,20 +21,19 @@ export class EventComponent implements OnInit {
     fights: Fight[];
 
 
-    constructor(private _service: MtdService) {
+    constructor(private _service: MtdService, private _routeParams: RouteParams) {
     }
 
 
     ngOnInit() {
-
+        let id = +this._routeParams.get('id');
+        this._service.getEvent(id).subscribe(res =>{
+            this.event = res;
+            this._service.getEventFights(this.event.id).subscribe(fights => this.fights = fights); 
+        });    
     }
 
-    toggle() {
-        this.showDetails = !this.showDetails;
-        if (this.fights === undefined || this.fights.length === 0) {
-            this._service.getEventFights(this.event.id).subscribe(res => this.fights = res);
-        }
-    }
+  
 
     getStatusLabel(status) {
         switch (status) {

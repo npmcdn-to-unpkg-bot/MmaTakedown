@@ -1,12 +1,17 @@
-<div class="event">
-	<div class="row" (click)="toggle()">
+<div class="stack" *ngIf="event">
+	<div class="row title" >
+	       <div class="col-md-2">
+	       
+	       </div>
 		<div class="col-md-6">
-			<h3>{{ event.name }}</h3>
+			<h1>{{ event.name }}</h1>
+			<p>{{ event.date }}</p>
 		</div>
-		<div class="col-md-6 date">{{ event.date }}</div>
-
 	</div>
-	<div clas="status row" *ngIf="showDetails">
+	
+	<!-- Status of event -->
+	<h2>Options</h2>
+	<div clas="status row">
 		<a (click)="refreshEvent()">Refresh</a>
 		<table class=" col-md-12 table table-striped table-condensed table-hover">
 			<thead>
@@ -56,9 +61,16 @@
 		</table>
 
 	</div>
-	<div class="row details" *ngIf="showDetails">
+	
+	<!-- Fights -->
+	<h2>Fights</h2>
+	<div class="row details">
 		<div class="row fights">
 			<fight class="col-md-4" *ngFor="#fight of fights" [fight]="fight"></fight>
 		</div>
 	</div>
 </div>
+
+<div class="stack" *ngIf="!event">
+    <div class="spinner"></div>
+</div >

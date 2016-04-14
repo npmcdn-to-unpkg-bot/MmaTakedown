@@ -20,6 +20,12 @@ export class MtdService {
         console.log("Get organizations");
         return this._http.get('api/organization').map(response => response.json());
     };
+    
+    updateOrganization(organization) {
+
+        console.log("update event");
+        return this._http.put('api/organization', JSON.stringify(organization), { headers: this.postPutHeader }).map(response => response.json());
+    }
 
     getOrganization(id) {
         console.log("Get organization");
@@ -30,6 +36,12 @@ export class MtdService {
         console.log("Get events");
         return this._http.get('api/organization/' + id + '/events').map(response => response.json());
     }
+    
+    
+     getEvent(id) {
+        console.log("Get event");
+        return this._http.get('api/event/' + id ).map(response => response.json());
+    };
 
     getEventFights(id) {
         console.log("Get event fights");
