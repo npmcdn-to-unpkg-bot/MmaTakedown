@@ -20,3 +20,4 @@ cache/
 mtd/
 mtd.db*
 /mtd.mv.db
+**/mtd.properties
