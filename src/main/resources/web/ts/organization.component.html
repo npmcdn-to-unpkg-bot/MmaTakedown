@@ -4,18 +4,17 @@
 			<h1>{{ organization.name }}</h1>
 		</div>
 	</div>
-	
 	<h2>Options</h2>
 	<div class="options card row">
 	   <div class="col-md-4">
-	       Follow: <input type="checkbox" [(ngModel)]="organization.following" (change)="updateOrganization()" value="1"/>
+	       Follow: <input type="checkbox"  (click)="follow($event.target.checked)" value="1"  [checked]="organization.following"/>
 	   </div>
 	   <div class="col-md-4">
-	       Prelims: <input type="checkbox" [(ngModel)]="organization.getPrelims" (change)="updateOrganization()" value="1"/>
+	       Prelims: <input type="checkbox"  (click)="followPrelims($event.target.checked)" value="1" [checked]="organization.getPrelims"/>
 	   </div>
 	   <div class="col-md-4">
 	       Quality:
-	       <select [(ngModel)]="organization.quality" (change)="updateOrganization()">
+	       <select  (change)="changeQuality($event.target.value)" [value]="organization.quality" >
 	           <option value="0">SD</option>
 	           <option value="1">HD</option>
 	           <option value="2">Any</option>
@@ -26,7 +25,7 @@
 	
 	<h2>Events</h2>
 	<div class="events card">
-    	<div *ngFor="#event of events" class="row event"  (click)="goToEvent(event)" (change)="updateOrganization()">
+    	<div *ngFor="#event of events" class="row event"  (click)="goToEvent(event)">
     	   <div class="col-md-3">
     	       {{ event.date }}
     	   </div>

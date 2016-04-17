@@ -1,9 +1,6 @@
 <div class="stack" *ngIf="event">
 	<div class="row title" >
-	       <div class="col-md-2">
-	       
-	       </div>
-		<div class="col-md-6">
+		<div class="col-md-12">
 			<h1>{{ event.name }}</h1>
 			<p>{{ event.date }}</p>
 		</div>
@@ -11,7 +8,7 @@
 	
 	<!-- Status of event -->
 	<h2>Options</h2>
-	<div clas="status row">
+	<div class="status row card">
 		<a (click)="refreshEvent()">Refresh</a>
 		<table class=" col-md-12 table table-striped table-condensed table-hover">
 			<thead>
@@ -64,13 +61,12 @@
 	
 	<!-- Fights -->
 	<h2>Fights</h2>
-	<div class="row details">
-		<div class="row fights">
-			<fight class="col-md-4" *ngFor="#fight of fights" [fight]="fight"></fight>
-		</div>
+	<div class="row fights card">
+		<fight *ngFor="#fight of fights" [fight]="fight"></fight>
 	</div>
 </div>
 
-<div class="stack" *ngIf="!event">
-    <div class="spinner"></div>
-</div >
+
+    <div class="stack" *ngIf="!event">
+        <div class="spinner"></div>
+    </div >

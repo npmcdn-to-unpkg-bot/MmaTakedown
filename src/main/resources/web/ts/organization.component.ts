@@ -30,9 +30,11 @@ export class OrganizationComponent implements OnInit, DoCheck {
 
     ngOnInit() {
         let id = +this._routeParams.get('id');
-        this._service.getOrganization(id).subscribe(res => this.organization = res);
-    
-
+        this._service.getOrganization(id).subscribe(res => {
+            this.organization = res
+            console.log('Loaded organization:');
+            console.log(this.organization);
+        });
         this._service.getEvents(id).subscribe(res => this.events = res.reverse());
     }
     
@@ -41,7 +43,24 @@ export class OrganizationComponent implements OnInit, DoCheck {
         this._router.navigate(link);    
     }
     
+    
+    follow(value){
+        this.organization.following = value;    
+        this.updateOrganization();
+    }
+    
+    followPrelims(value){
+        this.organization.getPrelims = value;  
+        this.updateOrganization();
+    }
+    
+    changeQuality(value){
+        this.organization.quality = value;    
+        this.updateOrganization();
+    }
+
     updateOrganization(){
-       setTimeout(() => {this._service.updateOrganization(this.organization).subscribe(res => this.organization = res)}, 100);
+        console.log(this.organization);
+       this._service.updateOrganization(this.organization).subscribe(res => this.organization = res);
     }
 }

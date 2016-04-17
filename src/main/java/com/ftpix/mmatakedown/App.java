@@ -128,7 +128,7 @@ public class App {
         ufc.setPicture("ufc.jpg");
         // ufc.setSearchInterceptor(UfcInterceptor.class.getCanonicalName());
 
-        // DB.organizationDao.createOrUpdate(ufc);
+        DB.organizationDao.createOrUpdate(ufc);
 
         Organization invicta = DB.organizationDao.queryForId(2);
         if (invicta == null) {

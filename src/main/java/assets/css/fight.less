@@ -1,44 +1,41 @@
 @import 'variables.less';
 .row {
-	border-radius: 5px;
-	height: @fight-height;
-	margin: 5px;
+
 }
 
 .fighter {
-	background-size: cover;
-	height: @fight-height;
-	background-color: grey;
+
 	background-position: center 0;
-	color: white;
 	text-align: center;
 	vertical-align: bottom;
 }
 
 .fighter1 {
-	border-top-left-radius: @border-radius;
-	border-bottom-left-radius: @border-radius;
+    text-align:right;
 }
 
 .fighter2 {
-	border-top-right-radius: @border-radius;
-	border-bottom-right-radius: @border-radius;
+    text-align:left;
+}
+
+.fighter-icon{
+    background-size:cover;
+    background-position: center 0;
+    width:80px;
+    height:80px;
+    border-radius:50%;
 }
 
 .col-md-2 {
 	background-color: #FF5722;
 	color: white;
 	font-size: 30px;
-	height: @fight-height;
 	font-style: italic;
 }
 
 .col-md-2 p {
-	@rotate: 90deg;
-	-webkit-transform: rotate(@rotate);
-	transform: rotate(@rotate);
 	padding: 0;
 	margin: 0;
-	text-align: center;
+	text-align: center
 }
 
